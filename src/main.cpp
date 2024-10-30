@@ -16,7 +16,8 @@ namespace {
         if (width == 0 || height == 0) return;
 
         vkDeviceWaitIdle(device->GetVkDevice());
-        swapChain->Recreate();
+        //swapChain->Recreate();
+        swapChain->Recreate(width, height);
         renderer->RecreateFrameResources();
     }
 
