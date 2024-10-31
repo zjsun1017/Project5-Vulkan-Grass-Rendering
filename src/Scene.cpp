@@ -1,10 +1,16 @@
 #include "Scene.h"
 #include "BufferUtils.h"
+#include <iostream>
 
 Scene::Scene(Device* device) : device(device) {
     BufferUtils::CreateBuffer(device, sizeof(Time), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, timeBuffer, timeBufferMemory);
     vkMapMemory(device->GetVkDevice(), timeBufferMemory, 0, sizeof(Time), 0, &mappedData);
     memcpy(mappedData, &time, sizeof(Time));
+
+    // FPS count
+    frameCount = 0;
+    fps = 0.0f;
+    lastFpsTime = std::chrono::high_resolution_clock::now();
 }
 
 const std::vector<Model*>& Scene::GetModels() const {
@@ -32,6 +38,16 @@ void Scene::UpdateTime() {
     time.totalTime += time.deltaTime;
 
     memcpy(mappedData, &time, sizeof(Time));
+
+    frameCount++;
+    duration<float> elapsed = duration_cast<duration<float>>(currentTime - lastFpsTime);
+    if (elapsed.count() >= 1.0f) {
+        fps = frameCount / elapsed.count();
+        std::cout << "FPS: " << fps << std::endl;
+
+        frameCount = 0;
+        lastFpsTime = currentTime;
+    }
 }
 
 VkBuffer Scene::GetTimeBuffer() const {

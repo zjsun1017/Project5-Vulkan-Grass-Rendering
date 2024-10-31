@@ -42,4 +42,9 @@ public:
     VkBuffer GetTimeBuffer() const;
 
     void UpdateTime();
+
+    // FPS count
+    long frameCount;
+    float fps = 0.0f;
+    high_resolution_clock::time_point lastFpsTime;
 };

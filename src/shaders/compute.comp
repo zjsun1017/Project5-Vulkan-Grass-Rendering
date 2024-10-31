@@ -5,7 +5,7 @@
 #define GRAVITY 9.8
 #define GRAVITYSTRENGTH 3.0
 #define WINDSTRENGTH 10.0
-#define ORICULLINGTHRESH 0.5
+#define ORICULLINGTHRESH 0.9
 #define T 0.05
 #define N 8
 #define D_MAX 20.0
@@ -123,13 +123,11 @@ void main() {
 	// to the culled blades buffer
 	// Note: to do this, you will need to use an atomic operation to read and update numBlades.vertexCount
 	// You want to write the visible blades to the buffer without write conflicts between threads
-
-	// Orientation test
-
+	
 	vec3 c = inverse(camera.view)[3].xyz;
-
+	// Orientation test
 #if ORICULLING
-	if (!inBounds(dot(normalize(c - v0), f), ORICULLINGTHRESH))
+	if (!inBounds(dot(normalize(c), f), ORICULLINGTHRESH))
 		return;
 #endif
 

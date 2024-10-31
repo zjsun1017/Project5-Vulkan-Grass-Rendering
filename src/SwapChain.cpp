@@ -171,9 +171,12 @@ void SwapChain::Create(int w, int h) {
         imageCount = surfaceCapabilities.maxImageCount;
     }
 
+    // --- Create swap chain ---
     VkSwapchainCreateInfoKHR createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    // Specify surface to be tied to
     createInfo.surface = vkSurface;
+    // Add details of the swap chain
     createInfo.minImageCount = imageCount;
     createInfo.imageFormat = surfaceFormat.format;
     createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -183,6 +186,7 @@ void SwapChain::Create(int w, int h) {
 
     const auto& queueFamilyIndices = instance->GetQueueFamilyIndices();
     if (queueFamilyIndices[QueueFlags::Graphics] != queueFamilyIndices[QueueFlags::Present]) {
+        // Images can be used across multiple queue families without explicit ownership transfers
         createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
         createInfo.queueFamilyIndexCount = 2;
         unsigned int indices[] = {
@@ -192,21 +196,29 @@ void SwapChain::Create(int w, int h) {
         createInfo.pQueueFamilyIndices = indices;
     }
     else {
+        // An image is owned by one queue family at a time and ownership must be explicitly transfered between uses
         createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
         createInfo.queueFamilyIndexCount = 0;
         createInfo.pQueueFamilyIndices = nullptr;
     }
 
+    // Specify transform on images in the swap chain (no transformation done here)
     createInfo.preTransform = surfaceCapabilities.currentTransform;
+    // Specify alpha channel usage (set to be ignored here)
     createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    // Specify presentation mode
     createInfo.presentMode = presentMode;
+    // Specify whether we can clip pixels that are obscured by other windows
     createInfo.clipped = VK_TRUE;
+    // Reference to old swap chain in case current one becomes invalid
     createInfo.oldSwapchain = VK_NULL_HANDLE;
 
+    // Create swap chain
     if (vkCreateSwapchainKHR(device->GetVkDevice(), &createInfo, nullptr, &vkSwapChain) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create swap chain");
     }
 
+    // --- Retrieve swap chain images ---
     vkGetSwapchainImagesKHR(device->GetVkDevice(), vkSwapChain, &imageCount, nullptr);
     vkSwapChainImages.resize(imageCount);
     vkGetSwapchainImagesKHR(device->GetVkDevice(), vkSwapChain, &imageCount, vkSwapChainImages.data());

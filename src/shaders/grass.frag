@@ -17,7 +17,7 @@ layout(location = 0) out vec4 outColor;
 void main() {
     float ambient = 0.5;
     vec3 lightDir = normalize(vec3(0.5, 1.0, 0.5));
-    float brightness = ambient + max(dot(teNormal, lightDir), 0.0);
+    float brightness = ambient + 0.5 * max(dot(teNormal, lightDir), 0.0);
 
     vec3 rootColor = vec3(0.1, 0.5, 0.1);
     vec3 tipColor = vec3(0.3, 0.8, 0.3);
