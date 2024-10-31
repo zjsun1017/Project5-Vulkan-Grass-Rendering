@@ -123,11 +123,11 @@ void main() {
 	// to the culled blades buffer
 	// Note: to do this, you will need to use an atomic operation to read and update numBlades.vertexCount
 	// You want to write the visible blades to the buffer without write conflicts between threads
-	
+
 	vec3 c = inverse(camera.view)[3].xyz;
 	// Orientation test
 #if ORICULLING
-	if (!inBounds(dot(normalize(c), f), ORICULLINGTHRESH))
+	if (!inBounds(dot(normalize(c - v0), f), ORICULLINGTHRESH))
 		return;
 #endif
 
@@ -142,7 +142,7 @@ void main() {
 	bool p2_inBound = inBounds(p2.x, p2.w + T) && inBounds(p2.y, p2.w + T) && inBounds(p2.z, p2.w + T);
 	bool pm_inBound = inBounds(pm.x, pm.w + T) && inBounds(pm.y, pm.w + T) && inBounds(pm.z, pm.w + T);
 
-	if ((!p1_inBound) && (!p2_inBound) && (!pm_inBound)) 
+	if ((!p1_inBound) && (!p2_inBound) && (!pm_inBound))
 		return;
 #endif
 

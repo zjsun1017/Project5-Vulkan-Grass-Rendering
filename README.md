@@ -32,7 +32,7 @@ The following GIF shows the rendering effect with applied forces but without any
 ![no_culling.gif](img%2Fno_culling.gif)
 
 #### (iii) Culling Tests
-The first GIF below shows the effect of orientation culling, while the second GIF shows the effect of distance culling. Since view-frustum culling removes grass blades outside the field of view, it’s not possible to display it below. For orientation culling, I set the culling threshold to 0.5 to make the effect more noticeable; however, in real scenarios, a threshold of 0.9 works better, avoiding unnatural over-culling.
+The first GIF below shows the effect of orientation culling, and the second GIF shows the effect of distance culling. Since view-frustum culling removes grass blades outside the field of view, it’s not possible to display it here. For orientation culling, I initially tried using the third column of the view matrix as the camera direction, but the result was incorrect because the view matrix is in the camera coordinate system, not the world coordinate system. After numerous attempts, I found that using the direction from the camera origin to v0 as the camera direction produced the correct effect.
 ![no_culling.gif](img%2Fori_culling.gif)
 ![no_culling.gif](img%2Fdist_culling.gif)
 
@@ -40,7 +40,7 @@ The first GIF below shows the effect of orientation culling, while the second GI
 #### (iv) Performance Analysis
 Performance analysis for grass rendering is challenging because culling largely depends on the current camera position. To observe the effects of certain culling techniques, the camera needs to be moved, but it’s difficult to ensure that each movement angle and distance is the same. Therefore, the test on how the number of grass blades impacts performance is conducted without any culling applied, as shown in the image below.
 ![blade_number.png](img%2Fblade_number.png)
-As we can see, starting from 2^13, the GPU has already reached thread saturation, and the growth rate becomes approximately linear with the increase in the number of grass blades. When the number of grass blades is very low, the FPS estimate isn’t very accurate, but even with just one blade, the maximum FPS is around 8000. This indicates that when the GPU is not yet saturated, it can render sparse grass extremely quickly.
+As we can see, starting from 2^13, the GPU has already reached thread saturation, and the growth rate becomes approximately linear with the increase in the number of grass blades. When the number of grass blades is very low, the FPS estimate isn’t very accurate, but even with just one blade, the maximum FPS is around 10000. This indicates that when the GPU is not yet saturated, it can render sparse grass extremely quickly.
 
-The following graph reflects the performance improvement from culling at 2^20 grass blades. The combined effect of the three culling techniques essentially results in a 1+1+1=3 effect, which aligns well with the linear relationship observed in the previous graph. Since a tolerance was set for the view-frustum, view-frustum culling only takes effect when the camera is very close to the grass, but this effect is quite significant.
+The following image reflects the performance improvement from culling. Interestingly, although it generally corresponds to the linear relationship shown in the previous graph, the combined effect of the three culling techniques yields a result where 1+1+1 > 3. This may be due to the compounded reduction in workload when multiple culling methods work together. Since a tolerance was set for the view-frustum, view-frustum culling only takes effect when the camera is very close to the grass, but this effect is quite significant.
 ![culling.png](img%2Fculling.png)
